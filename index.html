@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chat UI - Demo Builds</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  body {
+    background: #0d0d0d;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .wrap { width: 100%; max-width: 720px; }
+  h1 { font-size: 26px; font-weight: 600; color: #fff; letter-spacing: -0.4px; }
+  .sub { color: #888; font-size: 14.5px; margin-top: 8px; line-height: 1.6; }
+  .grid { display: grid; gap: 16px; margin-top: 32px; }
+  .card {
+    display: block;
+    text-decoration: none;
+    background: #161616;
+    border: 1px solid #222;
+    border-radius: 14px;
+    padding: 20px 22px;
+    transition: border-color 0.2s, transform 0.2s, background 0.2s;
+  }
+  .card:hover { border-color: #2563eb; transform: translateY(-2px); background: #181818; }
+  .card h2 { font-size: 16px; color: #fff; font-weight: 600; }
+  .card p { font-size: 13.5px; color: #999; margin-top: 6px; line-height: 1.55; }
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #60a5fa;
+    border: 1px solid #1e3a8a;
+    background: #0f172a;
+    border-radius: 6px;
+    padding: 2px 8px;
+    margin-bottom: 10px;
+  }
+  footer { margin-top: 30px; color: #555; font-size: 12.5px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>AI Chat UI &mdash; Demo Builds</h1>
+    <p class="sub">Three iterations of a single-file dark-mode chat interface. Each one is a standalone HTML page &mdash; open any of them directly.</p>
+    <div class="grid">
+      <a class="card" href="v3.html">
+        <span class="tag">Latest</span>
+        <h2>Clean SVG version</h2>
+        <p>Emoji-free, professional look with Feather-style SVG icons. Chat history, Markdown rendering, voice input, text-to-speech, auto-resizing input.</p>
+      </a>
+      <a class="card" href="v2.html">
+        <span class="tag">Feature-rich</span>
+        <h2>Emoji version (Malayalam)</h2>
+        <p>Full feature set with emoji icons and a Malayalam interface. Chat history, Markdown, voice input, copy &amp; speak actions.</p>
+      </a>
+      <a class="card" href="v1.html">
+        <span class="tag">Original</span>
+        <h2>Basic version (Malayalam)</h2>
+        <p>The first iteration: dark chat UI with Think / Search mode toggles and mock AI responses. Minimal, no dependencies beyond core HTML/CSS/JS.</p>
+      </a>
+    </div>
+    <footer>Static demo &mdash; AI replies are mocked. Connect a real API to make it functional.</footer>
+  </div>
+</body>
+</html>
