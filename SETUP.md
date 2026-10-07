@@ -9,6 +9,9 @@ This guide wires your OpenRouter key into `index.html` and gets it hosted **with
 | `index.html` | Your chat UI, now with a **Settings** panel (gear icon) and a real OpenRouter call. Replaces the old mock-only flow. |
 | `worker.js` | Cloudflare Worker proxy. Holds the key server-side. **Recommended.** |
 | `api/chat.js` | Vercel Edge Function proxy (same idea, for Vercel). |
+| `manifest.json` | Web app manifest - makes the UI installable as an app. |
+| `sw.js` | Service worker - offline app shell + install requirement. |
+| `icons/` | App icons (192, 512, maskable, apple-touch). |
 | `SETUP.md` | This guide. |
 
 ## What changed in index.html
@@ -102,6 +105,22 @@ Whichever you pick, set `ALLOWED_ORIGIN` on the proxy to that exact origin so ot
 2. Direct check: switch to **Direct**, paste your key, send a message. If you see a red "Connection error" bubble, the message tells you the HTTP status.
 3. Proxy check: deploy `worker.js`, set the URL, send a message. In your browser's Network tab, the request to your Worker must **not** contain any `Authorization` header - only the Worker adds it.
 
+## Install it as an app (PWA)
+
+The UI is now a Progressive Web App: it can be installed to a phone or desktop home screen and opens full-screen without the browser chrome.
+
+- **Android / Chrome / Edge:** open the site - an **install icon appears in the header** (next to the gear) when the app is installable. Tap it, or use the browser menu -> *Install app* / *Add to Home screen*.
+- **iOS Safari:** tap **Share -> Add to Home Screen**. (iOS does not show the in-page install button - the Share sheet is the only route.)
+- **Desktop Chrome/Edge:** an install icon appears in the address bar, or use the header icon.
+
+Requirements and notes:
+
+- It must be served over **HTTPS** (GitHub Pages, Cloudflare Pages, Netlify all do this). Installing from `file://` does not work.
+- Relative paths are used throughout, so it works fine from a sub-path like `https://<user>.github.io/chat-ui/`.
+- **Offline:** the app shell (page, icons, Markdown renderer) is cached, so it opens offline. Sending messages still needs the network.
+- The service worker only ever caches **same-origin GETs**. Your API POSTs - both the `/api/chat` proxy and a direct OpenRouter call - are never cached or served stale.
+- **After you edit `index.html`**, bump `VERSION` at the top of `sw.js` (e.g. `v1` -> `v2`) so installed clients pull the new shell instead of the cached one.
+
 ## Troubleshooting
 
 | Symptom | Likely cause |
@@ -111,3 +130,5 @@ Whichever you pick, set `ALLOWED_ORIGIN` on the proxy to that exact origin so ot
 | CORS error in console | `ALLOWED_ORIGIN` on the proxy doesn't match your site's origin. |
 | `Server not configured` | `OPENROUTER_API_KEY` secret/env var not set on the proxy. |
 | Blank / no stream | Proxy returned non-SSE; check `Content-Type` is `text/event-stream`. |
+| No install option appears | Not on HTTPS, or the manifest/SW didn't load. Check DevTools -> Application -> Manifest and Service Workers. |
+| Installed app shows the old UI | Bump `VERSION` in `sw.js` and redeploy. |
