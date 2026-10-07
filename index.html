@@ -430,6 +430,41 @@
         }
 
         ::selection { background: var(--accent); color: #fff; }
+
+        /* ===== SETTINGS MODAL ===== */
+        .settings-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            display: none; align-items: center; justify-content: center;
+            z-index: 1500; padding: 20px;
+        }
+        .settings-modal.visible { display: flex; }
+        .settings-card {
+            width: 100%; max-width: 460px; background: var(--bg-2);
+            border: 1px solid var(--border); border-radius: 14px;
+            box-shadow: 0 20px 60px var(--shadow); overflow: hidden;
+        }
+        .settings-head {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 18px; border-bottom: 1px solid var(--border);
+        }
+        .settings-head h3 { font-size: 16px; font-weight: 600; color: var(--text); }
+        .settings-body { padding: 18px; display: flex; flex-direction: column; gap: 6px; }
+        .settings-label { font-size: 12px; font-weight: 600; color: var(--text-2); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .settings-input {
+            width: 100%; background: var(--bg-3); border: 1px solid var(--border);
+            border-radius: 9px; padding: 10px 12px; color: var(--text);
+            font-size: 14px; font-family: inherit; outline: none;
+        }
+        .settings-input:focus { border-color: var(--accent); }
+        select.settings-input { cursor: pointer; }
+        .settings-hint { font-size: 11.5px; color: var(--text-2); margin-top: 2px; line-height: 1.4; }
+        .settings-hint.warn { color: #e8a33d; }
+        .settings-save {
+            margin-top: 16px; background: var(--accent); color: #fff; border: none;
+            border-radius: 9px; padding: 11px; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .settings-save:hover { background: var(--accent-hover); }
     </style>
 </head>
 <body>
@@ -483,6 +518,9 @@
                     </div>
                 </div>
                 <div class="header-actions">
+                    <button class="icon-btn" id="settingsBtn" title="Settings">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    </button>
                     <button class="icon-btn" id="exportBtn" title="Export chat">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -561,6 +599,42 @@
         <img id="modalImage" src="" alt="">
     </div>
 
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-card">
+            <div class="settings-head">
+                <h3>Settings</h3>
+                <button class="icon-btn" id="settingsCloseBtn" title="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="settings-body">
+                <label class="settings-label" for="setMode">Connection mode</label>
+                <select id="setMode" class="settings-input">
+                    <option value="proxy">Proxy (recommended - key stays on the server)</option>
+                    <option value="direct">Direct from browser (key stored in this browser)</option>
+                    <option value="mock">Demo / mock (no API call)</option>
+                </select>
+
+                <div id="proxyRow">
+                    <label class="settings-label" for="setProxyUrl">Proxy URL</label>
+                    <input id="setProxyUrl" class="settings-input" type="text" placeholder="/api/chat">
+                    <p class="settings-hint">Your serverless function that holds the key, e.g. /api/chat or https://your-worker.workers.dev</p>
+                </div>
+
+                <div id="apiKeyRow">
+                    <label class="settings-label" for="setApiKey">API key (OpenRouter)</label>
+                    <input id="setApiKey" class="settings-input" type="password" placeholder="sk-or-v1-..." autocomplete="off">
+                    <p class="settings-hint warn">Stored only in this browser's localStorage. Anyone with access to this browser can read it - use proxy mode for anything public.</p>
+                </div>
+
+                <label class="settings-label" for="setModel">Model</label>
+                <input id="setModel" class="settings-input" type="text" placeholder="openai/gpt-4o-mini">
+
+                <button class="settings-save" id="settingsSaveBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ===== DOM =====
         const chatArea = document.getElementById('chatArea');
@@ -589,6 +663,14 @@
         const toast = document.getElementById('toast');
         const imageModal = document.getElementById('imageModal');
         const modalImage = document.getElementById('modalImage');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const settingsCloseBtn = document.getElementById('settingsCloseBtn');
+        const settingsSaveBtn = document.getElementById('settingsSaveBtn');
+        const setMode = document.getElementById('setMode');
+        const setProxyUrl = document.getElementById('setProxyUrl');
+        const setApiKey = document.getElementById('setApiKey');
+        const setModel = document.getElementById('setModel');
 
         // ===== STATE =====
         let state = {
@@ -663,6 +745,26 @@
             }
             renderChatList();
             renderCurrentChat();
+        }
+
+        // ===== SETTINGS =====
+        const SETTINGS_KEY = 'ai_chat_settings';
+        let settings = {
+            mode: 'proxy',                 // 'proxy' | 'direct' | 'mock'
+            proxyUrl: '',                 // set to your proxy URL, e.g. /api/chat or https://<worker>.workers.dev
+            apiKey: '',
+            model: 'openai/gpt-4o-mini',
+            siteUrl: location.origin,
+            siteName: 'AI Chat UI'
+        };
+        function loadSettings() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+                settings = Object.assign(settings, saved);
+            } catch (e) { console.error(e); }
+        }
+        function saveSettings() {
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
         }
 
         // ===== THEME =====
@@ -900,7 +1002,7 @@
             chat.messages = chat.messages.slice(0, msgIndex);
             saveState(); renderCurrentChat();
             const lastUserMsg = [...chat.messages].reverse().find(m => m.sender === 'user');
-            if (lastUserMsg) simulateAIResponse(lastUserMsg.text);
+            if (lastUserMsg) requestAIResponse();
         }
 
         // ===== SEND =====
@@ -912,18 +1014,133 @@
             userInput.value = ''; userInput.style.height = 'auto';
             sendBtn.disabled = true;
             state.attachments = []; renderAttachments();
-            simulateAIResponse(text);
+            requestAIResponse();
         }
 
-        function simulateAIResponse(userText) {
+        // ===== AI REQUEST (OpenRouter) =====
+        function buildMessages() {
+            const chat = getCurrentChat();
+            const msgs = chat.messages
+                .filter(m => m.text && m.text.trim())
+                .map(m => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text }));
+            let sys = '';
+            if (state.isThinking) sys += 'Think step by step and show your reasoning before the final answer. ';
+            if (state.isSearching) sys += 'You do not have live web access; if a question needs current data, say what you would need to look up. ';
+            if (sys) msgs.unshift({ role: 'system', content: sys.trim() });
+            return msgs;
+        }
+
+        function createMessageShell(msgId) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper ai';
+            wrapper.dataset.msgId = msgId;
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            const contentDiv = document.createElement('div');
+            messageDiv.appendChild(contentDiv);
+            wrapper.appendChild(messageDiv);
+            const actions = document.createElement('div');
+            actions.className = 'message-actions';
+            actions.innerHTML = `
+                <button class="action-icon" data-action="copy">${ICONS.copy}</button>
+                <button class="action-icon" data-action="speak">${ICONS.speak}</button>
+                <button class="action-icon" data-action="regen">${ICONS.refresh}</button>
+                <button class="action-icon danger" data-action="del">${ICONS.trash}</button>
+            `;
+            wrapper.appendChild(actions);
+            return { wrapper, contentDiv, actions };
+        }
+
+        async function streamFromAPI(res) {
+            const chat = getCurrentChat();
+            if (!chat) return;
+            const msgId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+            const msg = { id: msgId, text: '', sender: 'ai', timestamp: Date.now() };
+            chat.messages.push(msg);
+            const shell = createMessageShell(msgId);
+            chatArea.appendChild(shell.wrapper);
+
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let full = '';
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop();
+                for (const line of lines) {
+                    const t = line.trim();
+                    if (!t || !t.startsWith('data:')) continue;
+                    const data = t.slice(5).trim();
+                    if (data === '[DONE]') continue;
+                    try {
+                        const json = JSON.parse(data);
+                        const delta = (json.choices && json.choices[0] && json.choices[0].delta && json.choices[0].delta.content) || '';
+                        if (delta) {
+                            full += delta;
+                            shell.contentDiv.innerHTML = marked.parse(full + '\u258a');
+                            if (!state.userScrolledUp) scrollToBottom();
+                        }
+                    } catch (e) { /* partial frame, skip */ }
+                }
+            }
+            if (!full) full = '_(empty response)_';
+            msg.text = full;
+            saveState(); renderChatList();
+            shell.contentDiv.innerHTML = marked.parse(full);
+            attachCodeCopyButtons(shell.contentDiv);
+            attachMessageActionHandlers(shell.actions, msg);
+        }
+
+        async function requestAIResponse() {
+            const chat = getCurrentChat();
+            if (!chat) return;
+
+            const mode = settings.mode;
+            const canCall = mode === 'proxy' ? !!settings.proxyUrl
+                          : mode === 'direct' ? !!settings.apiKey
+                          : false;
+
             typingIndicator.style.display = 'flex';
             chatArea.appendChild(typingIndicator);
             if (!state.userScrolledUp) scrollToBottom();
-            let response = MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)];
-            if (state.isThinking && state.isSearching) response = `**Think + Search Mode**\n\n_Thinking deeply and searching the web..._\n\n---\n\n${response}`;
-            else if (state.isThinking) response = `**Thinking Mode**\n\n_Let me think carefully..._\n\n---\n\n${response}`;
-            else if (state.isSearching) response = `**Search Mode**\n\n_Searching the web..._\n\n---\n\n${response}`;
-            setTimeout(() => { typingIndicator.style.display = 'none'; streamResponse(response); }, 800);
+
+            if (!canCall) {
+                let response = MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)];
+                if (state.isThinking && state.isSearching) response = `**Think + Search Mode**\n\n_Thinking deeply and searching the web..._\n\n---\n\n${response}`;
+                else if (state.isThinking) response = `**Thinking Mode**\n\n_Let me think carefully..._\n\n---\n\n${response}`;
+                else if (state.isSearching) response = `**Search Mode**\n\n_Searching the web..._\n\n---\n\n${response}`;
+                setTimeout(() => { typingIndicator.style.display = 'none'; streamResponse(response); }, 700);
+                return;
+            }
+
+            const endpoint = mode === 'proxy' ? settings.proxyUrl : 'https://openrouter.ai/api/v1/chat/completions';
+            const headers = { 'Content-Type': 'application/json' };
+            if (mode === 'direct') {
+                headers['Authorization'] = 'Bearer ' + settings.apiKey;
+                if (settings.siteUrl) headers['HTTP-Referer'] = settings.siteUrl;
+                if (settings.siteName) headers['X-Title'] = settings.siteName;
+            }
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ model: settings.model, messages: buildMessages(), stream: true })
+                });
+                if (!res.ok) {
+                    let detail = '';
+                    try { detail = (await res.text()).slice(0, 400); } catch (e) {}
+                    throw new Error('HTTP ' + res.status + (detail ? ' - ' + detail : ''));
+                }
+                typingIndicator.style.display = 'none';
+                await streamFromAPI(res);
+            } catch (err) {
+                typingIndicator.style.display = 'none';
+                streamResponse('**Connection error**\n\n' + (err && err.message ? err.message : String(err)) + '\n\n_Open Settings (gear icon) and check your mode, URL and key._');
+            }
         }
 
         function streamResponse(fullText) {
@@ -1191,11 +1408,42 @@
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); userInput.focus(); }
             if ((e.ctrlKey || e.metaKey) && e.key === 'n') { e.preventDefault(); createNewChat(); }
-            if (e.key === 'Escape') { userInput.blur(); closeSidebar(); imageModal.classList.remove('visible'); }
+            if (e.key === 'Escape') { userInput.blur(); closeSidebar(); imageModal.classList.remove('visible'); settingsModal.classList.remove('visible'); }
+        });
+
+        // ===== SETTINGS MODAL =====
+        function applyModeVisibility() {
+            const mode = setMode.value;
+            document.getElementById('proxyRow').style.display = mode === 'proxy' ? 'block' : 'none';
+            document.getElementById('apiKeyRow').style.display = mode === 'direct' ? 'block' : 'none';
+        }
+        function openSettings() {
+            setMode.value = settings.mode;
+            setProxyUrl.value = settings.proxyUrl;
+            setApiKey.value = settings.apiKey;
+            setModel.value = settings.model;
+            applyModeVisibility();
+            settingsModal.classList.add('visible');
+        }
+        function closeSettings() { settingsModal.classList.remove('visible'); }
+        settingsBtn.addEventListener('click', openSettings);
+        settingsCloseBtn.addEventListener('click', closeSettings);
+        settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) closeSettings(); });
+        setMode.addEventListener('change', applyModeVisibility);
+        settingsSaveBtn.addEventListener('click', () => {
+            settings.mode = setMode.value;
+            settings.proxyUrl = setProxyUrl.value.trim();
+            settings.apiKey = setApiKey.value.trim();
+            settings.model = setModel.value.trim() || 'openai/gpt-4o-mini';
+            saveSettings();
+            applyModeVisibility();
+            closeSettings();
+            showToast('Settings saved');
         });
 
         // ===== INIT =====
         loadTheme();
+        loadSettings();
         loadState();
     </script>
 </body>
